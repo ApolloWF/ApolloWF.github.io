@@ -1,0 +1,131 @@
+/* The alert message box */
+
+
+.error {
+    background-color: #ffdddd;
+    border-left: 6px solid #f44336;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.success {
+    background-color: #ddffdd;
+    border-left: 6px solid #4CAF50;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.info {
+    background-color: #e7f3fe;
+    border-left: 6px solid #2196F3;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+
+.warning {
+    background-color: #ffffcc;
+    border-left: 6px solid #ffeb3b;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.jumbotron {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    margin-bottom: 0;
+    background-color: #fff;
+}
+@media (min-width: 768px) {
+    .jumbotron {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+    }
+}
+
+/* side menu */
+
+.side-menu {
+    position: absolute;
+    left: 0;
+    height: 100%;
+}
+
+.sticky {
+    position: -webkit-sticky;
+    position: -moz-sticky;
+    position: -ms-sticky;
+    position: -o-sticky;
+    position: sticky;
+    top: 0;
+}
+
+.doc-menu {
+    list-style: none;
+}
+
+.doc-menu a:hover {
+    color: #064579;
+}
+
+.doc-menu .nav-link {
+    color: #616670;
+}
+
+.doc-menu .nav-link.active {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.doc-sub-menu .nav-link {
+    margin-bottom: 10px;
+    font-size: 12px;
+    display: block;
+    padding: 0;
+    padding-left: 34px;
+    background: none;
+}
+
+.menu {
+    width: 20%;
+    float: left;
+}
+
+.content {
+    width: 80%;
+    float: right;
+}
+
+.menu-and-content {
+    font-family: 'Roboto', sans-serif;
+    display: flex; /* equal height of the children */
+}
+
+.nav doc-menu sticky a {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+
+.sub-item {
+    text-indent: 15px;
+}
+
+.sub-sub-item {
+    text-indent: 30px;
+}
+
+/* Other */
+
+a.highlight {
+    font-weight: bold;
+}
+
+a.reference {
+    text-decoration: underline;
+    color: blue;
+}
+
+code.inline {
+    background-color: rgba(27,31,35,.05);
+}
