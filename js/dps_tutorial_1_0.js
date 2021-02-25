@@ -28,7 +28,7 @@ document.write(`
                                 <a href="#events">Events</a></br>
                                 <a href="#invoketype">Invocation type</a></br>
                                 <a href="#">Versions</a></br>
-                                <!--<a href="#"><div onclick="showV11()" class="sub-item">1.1</div></a>-->
+                                <a href="#"><div onclick="showV11()" class="sub-item">1.1</div></a>
                                 <a href="#"><div onclick="showV10()" style="color: red" class="sub-item"><b>1.0</b></div></a>
                             </nav>
                         </div>
