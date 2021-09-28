@@ -10,7 +10,9 @@ document.write(`
                 <a href="#sequenceAndParallel1.1"><div class="sub-item">Sequence/Parallel</div></a>
                 <a href="#conditionalCompound1.1"><div class="sub-item">Conditional compound</div></a>
                 <a href="#ifthenelse1.1"><div class="sub-sub-item">If-then-else</div></a>
+                <a href="#switch1.1"><div class="sub-sub-item">Switch</div></a>
                 <a href="#sequentialLoop1.1"><div class="sub-item">Sequential loop</div></a>
+                <a href="#for1.1"><div class="sub-sub-item">For</div></a>
                 <a href="#while1.1"><div class="sub-sub-item">While</div></a>
                 <a href="#parallelFor1.1"><div class="sub-item">ParallelFor</div></a>
                 <a href="#workflowFileStructure1.1">Workflow file structure</a></br>
@@ -66,8 +68,6 @@ document.write(`
                 <li>The <a class="highlight">loopCounter</a> element is removed for <a class="highlight">parallelFor</a> loops. Instead, a new field named <a class="highlight">iterator</a> is introduced.</li>
                 <li>The built-in property <a class="highlight">invoke-type</a> is removed from AFCL.</li>
                 <li>The <a class="highlight">saveto</a> field is removed from AFCL.</li>
-                <li>The conditional compound <a class="highlight">switch</a> is removed from AFCL.</li>
-                <li>The <a class="highlight">sequential for</a> loop is removed from AFCL.</li>
             </ul>
         </div>
 
@@ -238,7 +238,9 @@ The function has two outputs:
                         <a class="reference" href="#sequenceAndParallel1.1">sequence,
                         parallel</a>,
                         <a class="reference" href="#ifthenelse1.1">if-then-else</a>,
-                        <a class="reference" href="#while1.1">while</a>, and
+                        <a class="reference" href="#switch1.1">switch</a>,
+                        <a class="reference" href="#while1.1">while</a>,
+                        <a class="reference" href="#for1.1">for</a>, and
                         <a class="reference" href="#parallelFor1.1">parallelFor</a>. 
                         The specifications for the
                         name attribute, dataIns and dataOuts ports, along with the corresponding
@@ -463,74 +465,193 @@ dataOuts: [
 }
 </code></pre>
 </div>
+    <div id="switch1.1" >
+    <h2>Switch</h2>
+    The switch compound function can be used to select a single
+    <a class="highlight">case</a> or a <a class="highlight">default</a> compound function
+    depending on the value of the <a class="highlight">dataEval</a>
+    attribute, thereby acting as an XOR logical expression. In case <a class="highlight">break</a> is not
+    used, then the switch compound function acts as an OR logical expression and
+    multiple case branches might be selected.
+    <pre><code class="language-yaml">switch: {
+  name: "checkEmployeeID",
+  dataIns: [{}+]?,
+  dataEval:
+    {
+      name: "name",
+      type: "type",
+      source: "source"?
+    },
+  cases: [
+    {
+      value: "value",
+      break: true | false,
+      functions: [{function: {}}+]
+    }+
+  ],
+  default: [{function: {}}+]?,
+  dataOuts: [{}+]?
+}
+</code></pre>
+<h4>Example</h4>
+The following example shows a switch construct in AFCL. The construct has one input named <a class="highlight">employeeID</a> which is of type
+<a class="highlight">string</a>. The <a class="highlight">dataEval</a> field represents the expression of the switch condition. It is of type
+<a class="highlight">string</a> and it is specified by the input of the function. If the <a class="highlight">identifier</a> value equals to
+<code class="w3-codespan inline">"MK13GHT2"</code>, the base function <a class="highlight">employeeCheck</a> is executed.
+<pre><code class="language-yaml">switch: {
+  name: "checkEmployeeID",
+  dataIns: [
+    { name: "employeeID" , type: "string" , source: "addEmployeeToDataBase/employeeID" }
+  ],
+  dataEval:
+    {
+      name: "identifier",
+      type: "string",
+      source: "checkEmployeeID/employeeID"
+    },
+  cases: [
+    {
+      value: "MK13GHT2",
+      break: true,
+      functions: [{function: {name: "employeeCheck" , type: "checker"}}]
+    }
+  ]
+}
+</code></pre>
+</div>
 <div id="sequentialLoop1.1" >
     <h1>Sequential Loop</h1>
+Every <a class="highlight">for</a> and <a class="highlight">while</a> loop can optionally use <a class="highlight">dataLoop</a> ports
+to represent inputs to functions specified in a
+<a class="highlight">loopBody</a>. These ports get their initial value from the <a class="highlight">initSource</a> field, which is either a constant
+or a source to another data port. A
+<a class="highlight">loopSource</a> field specifies a data-flow from the output of a
+function of the loop body which can be used as input to functions
+executed in the next loop iteration. <a class="highlight">name</a> is an unique identifier
+of a dataLoop port and type specifies the data type of the value.
+</div>
+    <div id="for1.1">
+    <h2>For</h2>
+    The for compound function executes its <a class="highlight">loopBody</a> multiple times
+    based on the specified <a class="highlight">loopCounter</a>. The value of the loopCounter is initially
+    set to the value specified by the attribute <a class="highlight">from</a> and is then increased by the
+    value of <a class="highlight">step</a> until it reaches the value of <a class="highlight">to</a> or larger. The attributes from,
+    to, and step can be specified with a constant value or with data ports of other
+    functions. The loopCounter can be of <a class="highlight">type</a> number. To express 
+    dependencies across loop iterations the <a class="highlight">dataLoop</a> ports
+    are used.
+    <pre><code class="language-yaml">for: {
+  name: "name",
+  dataIns: [{}+]?,
+  dataLoops: [
+    {
+      name: "name",
+      type: "type",
+      initSource: "source",
+      loopSource: "source",
+    }+
+  ]?,
+  loopCounter:
+    {
+      name: "name",
+      type: "type",
+      from: "from",
+      to: "to",
+      step: "step",?
+    },
+  loopBody: [{function: {}}+],
+  dataOuts: [{}+]?
+}
+</code></pre>
+<h4>Example</h4>
+The following example illstrates a for construct in AFCL. The loop iterates <code class="w3-codespan inline">10</code> times, as specified in the <a class="highlight">loopCounter</a>
+field. The <a class="highlight">dataLoops</a> field illustrates the dependency between loop iterations. The inital value is set from the function
+named <a class="highlight">otherFunction</a>. The value is updated in every loop iteration by the output value <a class="highlight">numObjects</a> of
+<a class="highlight">getNumberObjects</a>. Additionally, the input to the function <a class="highlight">currentNumberObjects</a> is the output of the
+previous iteration of the function.
+<pre><code class="language-yaml">for: {
+  name: "sumUp",
+  dataLoops: [
+    {
+      name: "sum",
+      type: "number",
+      initSource: "otherFunction/initValue",
+      loopSource: "getNumberObjects/numObjects"
+    }
+  ],
+  loopCounter: { name: "counter" , type: "number" , from: 0 , to: 10 },
+  loopBody: [
+    {
+    function: {
+        name: "getNumberObjects",
+        type: "objectRecognition",
+        dataIns: [
+            { name: "imagePath" , type: "string" , source: "https://external.storage.com/images" },
+            { name: "curentNumberObjects" , type: "number" , source: "sumUp/sum" }
+          ],
+        dataOuts: [
+            { name: "numObjects" , type: "number" }
+        ]
+      }
+    }
+  ],
+  dataOuts: [
+    { name: "totalObjects" , type: "number" , source: "sumUp/sum" }
+  ],
+}
+</code></pre>
 </div>
 <div id="while1.1">
     <h2>While</h2>
     The while compound function is used to execute a <a class="highlight">loopBody</a> zero
-    or more times, depending on the specified <a class="highlight">condition</a>. For all
-    condition evaluations which are based on numbers, it is possible to enter a reference
-    to a collection as one of the terms. A collection entry referencing the collection
-    <a class="highlight">collection</a> is then evaluated as a number equal to
-    <a class="highlight">collection.size() - 1</a>.
-    </br>
-    Since any data which remains unchanged over the course of the <a class="highlight">while</a> iterations
-    can be directly references, the dataIns and dataOuts of a <a class="highlight">while</a> compound are
-    used exclusively to refer to data which changes between subsequent iterations. This means that for each dataIn
-    with a certain name, there must be a dataOut with the same name. The resolution of a reference pointing to the
-    dataIn/out of the while from <a class="highlight">within</a> a while compound depends on the iteration of the while:
-    <ul>
-        <li>In the <a class="highlight">first iteration</a>, the reference is resolved as if pointing to the dataIn.</li>
-        <li>In <a class="highlight">all later iterations</a>, the reference is resolved as if pointing to the dataOut.</li>
-    </ul>
-    Any reference to a dataIn/out of a while compound from <a class="highlight">outside</a> the compound is resolved as
-    if pointing to the dataOut of the compound.
-    Apart from that the condition has the same structure as in the <a class="reference" href="#ifthenelse1.1">if-then-else</a> compound.
-
-    </br>
+    or more times, depending on the specified <a class="highlight">condition</a>. The condition has the
+    same structure as in the <a class="reference" href="#ifthenelse1.1">if-then-else</a> compound.
     The loopBody will be executed until the specified condition evaluates to <code class="w3-codespan inline">false</code>.
-    </br>
-    The <a class="highlight">counter</a> is a special data node which keeps track of the current iteration number. Within the
-    workflow yaml file, the counter of the while compound named <a class="highlight">name</a> can be referenced via
-    <a class="highlight">name/counter</a>.
-
+    Similarly as in the <a class="reference" href="#for1.1">for</a> compound function, dependencies across loop iterations
+    in while can be expressed with <a class="highlight">dataLoop</a> ports.
     <pre><code class="language-yaml">while: {
   name: "name",
   dataIns: [{}+]?,
+  dataLoops: [
+    {
+      name: "name",
+      type: "type",
+      initSource: "source",
+      loopSource: "source",
+    }+
+  ]?,
   condition: [{}+],
   loopBody: [{function: {}}+],
   dataOuts: [{}+]?
 }
 </code></pre>
 <h4>Example</h4>
-The following example shows the while construct in AFCL. The construct will execute the function specified in the
-<a class="highlight">loopCounter</a> five times, as specified in <a class="highlight">condition</a>. The input to
-the <a class="highlight">increment</a> function is the output of the function from the previous iteration. The input
-for the first iteration is specified in the <a class="highlight">dataIn</a> of the while construct, while the
-<a class="highlight">dataOut</a> of the construct specifies the result of the function from the last iteration.
+The following example shows the while construct in AFCL. WIthin this example one iteration passes a value to the next iteration, specified with the
+<a class="highlight">dataLoops</a> field. The initial value of the <a class="highlight">continue</a> variable of type <a class="highlight">boolean</a>
+is given by the function <a class="highlight">otherFunction</a>. The value is updated after every loop iteration according to the value of <a class="highlight">continueLoop</a>
+of the <a class="highlight">checkEmployees</a> function. The loop body will be executed until the value of <a class="highlight">employeesInBuilding</a> is false as
+specified in the <a class="highlight">condition</a> field.
 <pre><code class="language-yaml">while: {
-  name: "while",
-  dataIns:
-      [ { name: "sum", type: "number", source: "workflow/input" } ],
+  name: "recognizeObjects",
+  dataLoops: [
+    {
+      name: "continue",
+      type: "boolean",
+      initSource: "otherFunction/shouldStart",
+      loopSource: "checkEmployees/employeesInBuilding",
+    }
+  ],
   condition:
-      [ { data1: "while/counter" , data2: 5 , operator: "<" ,  type: "number" , negation: "false" , combinedWith: "and" } ],
+      [ { data1: "recognizeObjects/continue" , data2: true , operator: "==",  type: "boolean", combinedWith: "and" } ],
   loopBody: [
     function: {
-        name: "increment",
-        type: "Addition",
-        dataIns: [
-            { name: "firstSummand" , type: "number" , source: "while/sum" },
-            { name: "secondSummand" , type: "number" , source: 1 },
-            { name: "waitTimeIn" , type: "number" , source: 1000 }
-        ],
+        name: "checkEmployees",
+        type: "detectEmployees",
         dataOuts: [
-            { name: "sum" , type: "number" }
+            { name: "employeesInBuilding" , type: "boolean" }
         ]
       }
-  ],
-  dataOuts:
-        [ { name: "sum", type: "number", source: "increment/sum" } ]
+  ]
 }
 </code></pre>
     </div>
